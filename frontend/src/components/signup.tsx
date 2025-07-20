@@ -30,9 +30,7 @@ const Signup: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isPasswordValid) {
-      // Submit the form data to your backend
       console.log('Form submitted:', { fullName, email, password });
-      // Add your API call here
     }
   };
 
