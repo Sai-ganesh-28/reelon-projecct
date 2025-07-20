@@ -1,15 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './components/login';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes';
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <Routes>
-          <Route path="/" element={<Login />} />
-          {/* Add more routes as needed */}
-        </Routes>
+        <AppRoutes />
       </div>
     </Router>
   );
