@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../services/api';
 
 const Signup: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -7,6 +8,9 @@ const Signup: React.FC = () => {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Password validation
   useEffect(() => {
@@ -27,10 +31,32 @@ const Signup: React.FC = () => {
     }
   }, [password]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isPasswordValid) {
-      console.log('Form submitted:', { fullName, email, password });
+      setError('');
+      setIsLoading(true);
+      
+      try {
+        const response = await authService.signup({
+          name: fullName,
+          email,
+          password
+        });
+        
+        authService.setToken(response.token);
+        setIsLoading(false);
+        navigate('/dashboard');
+      } catch (err) {
+        setIsLoading(false);
+        if (typeof err === 'string') {
+          setError(err);
+        } else if (Array.isArray(err)) {
+          setError(err.join(', '));
+        } else {
+          setError('Failed to create account. Please try again.');
+        }
+      }
     }
   };
 
@@ -40,7 +66,7 @@ const Signup: React.FC = () => {
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-green-400 to-green-600 px-8 py-6 text-white">
             <h2 className="text-3xl font-bold">Create Account</h2>
-            <p className="opacity-80">Sign up for a new account</p>
+            <p className="opacity-80">Start your consistency journey</p>
           </div>
           
           {/* Form */}
@@ -99,12 +125,18 @@ const Signup: React.FC = () => {
                 </p>
               </div>
 
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              
               <button
                 type="submit"
-                disabled={!isPasswordValid}
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white ${isPasswordValid ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200`}
+                disabled={!isPasswordValid || isLoading}
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white ${isPasswordValid && !isLoading ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200`}
               >
-                Sign up
+                {isLoading ? 'Creating Account...' : 'Sign up'}
               </button>
             </form>
           </div>

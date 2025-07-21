@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PlusIcon,
@@ -8,6 +8,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import HabitCalendar from './Calendar';
+import { authService } from '../services/api';
 
 export interface Habit {
   id: number;
@@ -18,6 +19,29 @@ export interface Habit {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [userName, setUserName] = useState('');
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = authService.getToken();
+      
+      if (!token) {
+        navigate('/');
+        return;
+      }
+      
+      try {
+        const userData = await authService.getCurrentUser(token);
+        setUserName(userData.user.name);
+      } catch (error) {
+        console.error('Authentication error:', error);
+        authService.removeToken();
+        navigate('/');
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
   const [showModal, setShowModal] = useState(false);
   const [habitName, setHabitName] = useState('');
   const [habitDesc, setHabitDesc] = useState('');
@@ -84,7 +108,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleLogout = () => {
-    console.log('Logout clicked');
+    authService.removeToken();
     navigate('/');
   };
 
@@ -149,7 +173,9 @@ const Dashboard: React.FC = () => {
             <div className="bg-green-500 p-2 rounded-full" />
             <div>
               <h1 className="text-xl font-semibold text-gray-900">Consistently</h1>
-              <p className="text-sm text-gray-600">Welcome back, saiganesh</p>
+              <p className="text-sm text-gray-600">
+                {userName ? `Welcome, ${userName}!` : 'Welcome back'}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-3">

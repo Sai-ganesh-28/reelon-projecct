@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../services/api';
 
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      const response = await authService.login({ email, password });
+      authService.setToken(response.token);
+      setIsLoading(false);
+      navigate('/dashboard');
+    } catch (err) {
+      setIsLoading(false);
+      if (typeof err === 'string') {
+        setError(err);
+      } else if (Array.isArray(err)) {
+        setError(err.join(', '));
+      } else {
+        setError('Failed to login. Please check your credentials.');
+      }
+    }
   };
 
   return (
@@ -18,7 +38,7 @@ const Login: React.FC = () => {
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-green-400 to-green-600 px-8 py-6 text-white">
             <h2 className="text-3xl font-bold">Welcome back</h2>
-            <p className="opacity-80">Sign in to your account</p>
+            <p className="opacity-80">Sign in to Consistently</p>
           </div>
           
           {/* Form */}
@@ -56,11 +76,18 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                disabled={isLoading}
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200`}
               >
-                Sign in
+                {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
             </form>
           </div>
