@@ -16,6 +16,19 @@ Rails.application.routes.draw do
       post 'auth/signup', to: 'auth#signup'
       post 'auth/login', to: 'auth#login'
       get 'auth/me', to: 'auth#me'
+      
+      # Habits routes
+      resources :habits do
+        member do
+          post 'toggle_completion'
+        end
+        
+        # Nested completions routes
+        resources :completions, only: [:index, :create, :destroy]
+        
+        # Nested streak route
+        resource :streak, only: [:show]
+      end
     end
   end
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { Habit } from '../components/dashboard';
 
-
 const cn = (...classes: (string | boolean | undefined)[]) => {
   return classes.filter(Boolean).join(' ');
 };
@@ -66,11 +65,9 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, onSelectDate, isCo
     return bestStreak;
   };
 
-  // Calculate streaks and rate
   const current = calculateCurrentStreak();
   const best = calculateBestStreak();
-  
-  // Calculate completion rate
+
   const totalPossibleDays = currentDay - effectiveHabitCreationDay + 1;
   let totalCompletedDays = 0;
   
@@ -100,7 +97,9 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, onSelectDate, isCo
         </div>
       </div>
       
-      <div className="text-xs text-gray-500 mb-2">July 2025</div>
+      <div className="text-xs text-gray-500 mb-2">
+        {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
+      </div>
       
       <div className="grid grid-cols-7 gap-0.5">
         {/* Day headers */}
@@ -131,15 +130,14 @@ const HabitCalendar: React.FC<HabitCalendarProps> = ({ habit, onSelectDate, isCo
               key={`day-${day}`}
               onClick={isClickable ? () => onSelectDate(habit.id, dateString) : undefined}
               disabled={!isClickable}
-              className={`
-                w-8 h-8 text-xs flex items-center justify-center
-                ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100'}
-                ${isBeforeCreation ? 'opacity-50 cursor-not-allowed' : ''}
-                ${isFuture ? 'opacity-50 cursor-not-allowed' : ''}
-                ${isToday ? 'ring-1 ring-green-500' : ''}
-                ${isSelected ? 'ring-2 ring-blue-500' : ''}
-                rounded-md
-              `}
+              className={cn(
+                'w-8 h-8 text-xs flex items-center justify-center rounded-md',
+                isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100',
+                isBeforeCreation && 'opacity-50 cursor-not-allowed',
+                isFuture && 'opacity-50 cursor-not-allowed',
+                isToday && 'ring-1 ring-green-500',
+                isSelected && 'ring-2 ring-blue-500'
+              )}
             >
               {day}
             </button>
