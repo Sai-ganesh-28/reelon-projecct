@@ -1,4 +1,4 @@
-# Reelon Habit Tracker - Backend
+# Reelon Habit Tracker(Consistently) - Backend
 
 A Rails API backend for the Reelon Habit Tracker application, designed to help users build and maintain positive habits through streak tracking, notifications, and analytics.
 
@@ -69,7 +69,7 @@ A Rails API backend for the Reelon Habit Tracker application, designed to help u
 - `POST /api/v1/habits/:id/toggle_completion` - Toggle completion status for a habit
 
 
-## Frontend
+## Frontend(Consistently)
 
 ### Technology Stack
 
